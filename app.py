@@ -11,14 +11,14 @@ st.set_page_config(page_title="IntegraSalud SDE", page_icon="favicon.png", layou
 # -----------------------------------------------------------------------------
 # PEGA AQUÍ TU NUEVA Y SECRETA API KEY
 # -----------------------------------------------------------------------------
-api_key = "AIzaSyDYVwCZQ9jOPeFgK-Z0qBJ4a8Ijv0J7fn4"
+api_key = st.secrets.get("GOOGLE_API_KEY")
 # -----------------------------------------------------------------------------
 
 # --- LÓGICA ONLINE ---
 model = None
 online_mode_ready = False 
 
-if api_key == "AIzaSyDYVwCZQ9jOPeFgK-Z0qBJ4a8Ijv0J7fn4":
+if api_key == st.secrets.get("GOOGLE_API_KEY"):
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash-latest')

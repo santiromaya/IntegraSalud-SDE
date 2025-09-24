@@ -1,0 +1,7 @@
+# Ignorar la carpeta de configuración de Streamlit que contiene los secretos.
+# Esto previene que tu archivo secrets.toml (con tu API key) se suba a GitHub.
+.streamlit/
+
+# Ignorar archivos de caché de Python
+__pycache__/
+*.pyc
