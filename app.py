@@ -6,19 +6,97 @@ import base64
 from pathlib import Path
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="IntegraSalud SDE", page_icon="favicon.png", layout="centered")
+# CAMBIO: Se ajusta el layout a "wide" para ocupar más espacio horizontal.
+st.set_page_config(page_title="IntegraSalud SDE", page_icon="favicon.png", layout="wide")
 
-# -----------------------------------------------------------------------------
-# PEGA AQUÍ TU NUEVA Y SECRETA API KEY
-# -----------------------------------------------------------------------------
+# --- ESTILOS CSS (CON LAYOUT AMPLIO) ---
+custom_css = """
+<style>
+    /* Oculta el encabezado por defecto para usar el nuestro */
+    header {visibility: hidden;}
+
+    /* Mejora de Contraste General */
+    .stApp {
+        color: #e1e1e1;
+    }
+
+    /* Contenedor Principal */
+    .main .block-container p {
+        font-size: 2rem !important; /* Aumentado aún más */
+    }
+
+    /* Estructura del encabezado personalizado */
+    .custom-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem; /* Aumentado */
+    }
+    .custom-header img {
+        width: 400px; 
+        margin-right: 20px; /* Aumentado */
+    }
+    .custom-header .title-text {
+        font-size: 3rem;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.2;
+        color: #ffffff;
+    }
+    .custom-header .caption-text {
+        /* CAMBIO: Tamaño de fuente aumentado en un 25% */
+        margin: 0;
+        font-size: 1.3rem;
+        color: #a0a0a0;
+    }
+    
+    /* Formulario de consulta */
+    div[data-testid="stForm"] {
+        font-size: 1.5rem !important;
+        border: 1px solid #444;
+        border-radius: 10px;
+        padding: 1.5rem 1.5rem 0.6rem 1.5rem; /* Aumentado */
+        margin-top: 1.25rem; /* Aumentado */
+    }
+    
+    /* Media Query para celulares */
+    @media (max-width: 640px) {
+        .main .block-container {
+            padding: 1.25rem; /* Aumentado */
+            max-width: 100%;
+        }
+        .custom-header img {
+            /* CAMBIO: Tamaño del logo aumentado en un 25% */
+            width: 56px;
+            margin-right: 12px; /* Aumentado */
+        }
+        .custom-header .title-text {
+            /* CAMBIO: Tamaño de fuente aumentado en un 25% */
+            font-size: 1.875rem;
+        }
+        .custom-header .caption-text {
+            /* CAMBIO: Tamaño de fuente aumentado en un 25% */
+            font-size: 1.125rem;
+        }
+        div[data-testid="stForm"] {
+            padding: 1rem; /* Aumentado */
+        }
+    }
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+
+# --- API KEY ---
+# Lee la clave desde el archivo secrets.toml
 api_key = st.secrets.get("GOOGLE_API_KEY")
-# -----------------------------------------------------------------------------
+
 
 # --- LÓGICA ONLINE ---
 model = None
 online_mode_ready = False 
 
-if api_key == st.secrets.get("GOOGLE_API_KEY"):
+# La forma correcta de verificar si la clave existe
+if api_key:
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash-latest')
@@ -27,7 +105,7 @@ if api_key == st.secrets.get("GOOGLE_API_KEY"):
         st.error(f"Error al configurar la API de Google. El modo online no funcionará.")
         st.exception(e) 
 else:
-    st.warning("API Key no configurada. El modo online está desactivado.")
+    st.warning("API Key no encontrada en secrets.toml. El modo online está desactivado.")
 
 
 # --- CONTENIDO DE LAS CATEGORÍAS (Base estática) ---
@@ -38,43 +116,22 @@ CONTENIDO_CATEGORIAS_BASE = {
         "placeholder": "Prueba con 'ITS' o 'turno'...",
         "preguntas_frecuentes": {
             "its": """
-            Las Infecciones de Transmisión Sexual (ITS) se transmiten de una persona a otra durante las relaciones sexuales (vaginales, anales u orales). Algunas de las más comunes son el VPH, la sífilis, la gonorrea, la clamidia y el VIH.
-
-            Muchas ITS no presentan síntomas visibles, por lo que una persona puede tener una y no saberlo. La forma más efectiva de prevenirlas es usando **preservativo** en todas las relaciones sexuales. También es fundamental realizarse controles médicos periódicos.
-
-            **Recuerda: Si tienes dudas, síntomas o simplemente quieres controlarte, consulta a un profesional de la salud.**
+            Las Infecciones de Transmisión Sexual (ITS) se transmiten de una persona a otra durante las relaciones sexuales. Algunas comunes son VPH, sífilis, y VIH. Muchas no presentan síntomas, por lo que el uso de **preservativo** y los controles médicos son clave.
+            **Recuerda siempre consultar a un profesional de la salud.**
             """,
             "ets": """
-            El término "Enfermedades de Transmisión Sexual" (ETS) se usaba antiguamente. Hoy se prefiere "Infecciones de Transmisión Sexual" (ITS) porque describe mejor la situación: una persona puede tener una infección (y transmitirla) sin necesariamente desarrollar los síntomas de una "enfermedad".
-
-            El concepto de prevención es exactamente el mismo: el uso de preservativo es clave para reducir el riesgo.
-
-            **Para un diagnóstico correcto y tratamiento, es fundamental que consultes a un médico/a.**
+            El término "Enfermedades de Transmisión Sexual" (ETS) hoy se conoce como ITS (Infecciones), ya que se puede tener y transmitir una infección sin mostrar síntomas de enfermedad. La prevención es la misma: ¡usar preservativo!
+            **Para un diagnóstico correcto, consulta a un médico/a.**
             """,
             "anticonceptivos": """
-            Existen diversos métodos anticonceptivos para planificar la familia y prevenir embarazos no intencionados. Se dividen principalmente en:
-            - **De barrera:** Preservativo (el único que también previene ITS), diafragma.
-            - **Hormonales:** Pastillas anticonceptivas, inyecciones mensuales, implante subdérmico (el "chip"), DIU hormonal.
-            - **DIU de Cobre:** Un dispositivo intrauterino que no contiene hormonas.
-            - **De emergencia:** La pastilla del día después, que debe usarse solo en casos de emergencia y no como método regular.
-
-            **La elección del método es muy personal y depende de tu cuerpo y estilo de vida. Un/a ginecólogo/a o profesional de la salud te puede asesorar para encontrar el más adecuado para ti.**
+            Existen diversos métodos: de barrera (preservativo), hormonales (pastillas, DIU hormonal, implante), y el DIU de Cobre. La pastilla del día después es solo para emergencias.
+            **Un/a ginecólogo/a te puede asesorar para encontrar el método más adecuado para ti.**
             """,
             "preservativo": """
-            El preservativo, también conocido como condón, es el método más eficaz para la **doble protección**: previene tanto los embarazos no intencionados como la transmisión de la gran mayoría de las Infecciones de Transmisión Sexual (ITS), incluyendo el VIH.
-
-            Debe usarse correctamente, colocándolo antes de cualquier penetración y retirándolo al finalizar. En Argentina, puedes conseguir preservativos de forma gratuita en hospitales, salitas y centros de salud públicos.
+            El preservativo (o condón) es el único método que ofrece **doble protección**: previene embarazos y la mayoría de las ITS. Se consiguen gratis en hospitales y centros de salud públicos.
             """,
             "consentimiento": """
-            El consentimiento en las relaciones sexuales es fundamental e innegociable. Significa que todas las personas involucradas están de acuerdo de forma **entusiasta, voluntaria, clara y consciente** en participar en una actividad sexual.
-
-            **Puntos Clave del Consentimiento:**
-            - Debe ser explícito: ¡El silencio no es un sí!
-            - Se puede retirar en cualquier momento, sin importar lo que haya pasado antes.
-            - No se puede dar si una persona está dormida, inconsciente o bajo los efectos del alcohol o drogas.
-            - Que hayas dicho que sí antes, no significa que digas que sí ahora.
-
-            **Sin consentimiento, cualquier acto sexual es abuso.**
+            El consentimiento es un acuerdo **entusiasta, voluntario y claro** para participar en una actividad sexual. Puede retirarse en cualquier momento y el silencio no es un sí. **Sin consentimiento, es abuso.**
             """
         },
         "system_prompt": """
@@ -136,7 +193,7 @@ CONTENIDO_CATEGORIAS_BASE = {
             **Escucha a tu cuerpo: si tienes sed, ¡bebe agua! Un profesional de la salud puede darte pautas más específicas.**
             """,
             "carbohidratos": """
-            Las carbohidratos son la principal fuente de combustible del cuerpo, especialmente para el cerebro y los músculos. No todos son iguales:
+            Los carbohidratos son la principal fuente de combustible del cuerpo, especialmente para el cerebro y los músculos. No todos son iguales:
             - **Complejos:** Se absorben lentamente, dando energía sostenida. Se encuentran en granos integrales, avena, legumbres y verduras.
             - **Simples:** Se absorben rápido, dando un pico de energía. Están en azúcares, dulces y harinas refinadas.
 
@@ -183,7 +240,15 @@ def mostrar_interfaz_de_turnos():
     if 'codigo_generado' in st.session_state and st.session_state.codigo_generado:
         info = st.session_state.codigo_generado
         st.success("¡Tu código ha sido generado con éxito!")
-        st.markdown(f"<p style='text-align: center; color: #007bff;'>{info['codigo']}</p>", unsafe_allow_html=True)
+        st.markdown(f"""
+        **Tu código de turno anónimo es:**
+        ## <p style='text-align: center; color: #007bff;'>{info['codigo']}</p>
+        **Próximos pasos:**
+        1.  Guarda este código (anótalo o sácale una captura).
+        2.  Dirígete a **{info['centro']}**.
+        3.  Presenta este código en recepción para tu turno de **{info['especialidad']}**.
+        *No se te pedirá ningún dato personal hasta que llegues al centro de salud.*
+        """, unsafe_allow_html=True)
         st.balloons()
         del st.session_state.codigo_generado
 
@@ -195,7 +260,6 @@ def obtener_respuesta_hibrida(query, categoria_seleccionada):
     if categoria_seleccionada == "Salud Sexual" and "turno" in query_minusculas:
         return None, "turno"
         
-    # CAMBIO: Busca en la base de datos dinámica de la sesión
     preguntas_offline = st.session_state.contenido_dinamico[categoria_seleccionada]["preguntas_frecuentes"]
     for palabra, respuesta in preguntas_offline.items():
         if palabra in query_minusculas: 
@@ -207,12 +271,7 @@ def obtener_respuesta_hibrida(query, categoria_seleccionada):
             full_prompt = f"{system_prompt} Responde a la siguiente consulta del usuario: {query}"
             response = model.generate_content(full_prompt)
             respuesta_online = response.text
-
-            # --- LÓGICA DE AUTO-APRENDIZAJE ---
-            # Guarda la nueva respuesta en la base de datos de la sesión actual
             st.session_state.contenido_dinamico[categoria_seleccionada]["preguntas_frecuentes"][query_minusculas] = respuesta_online
-            # --- FIN DE LA LÓGICA ---
-
             return respuesta_online, "online"
         except Exception as e: 
             return f"Hubo un problema al contactar a la IA. Error técnico: {e}", "error"
@@ -227,21 +286,12 @@ def get_image_as_base_64(file):
         return base64.b64encode(data).decode()
     except FileNotFoundError: return None
 
-# --- NAVEGACIÓN Y ESTADO ---
-if 'view' not in st.session_state:
-    st.session_state.view = 'chat'
-if 'respuesta_actual' not in st.session_state:
-    st.session_state.respuesta_actual = None
-if 'categoria' not in st.session_state:
-    st.session_state.categoria = "Salud Sexual"
-if 'historial' not in st.session_state:
-    st.session_state.historial = []
-# CAMBIO: Inicializa la base de datos dinámica si no existe
-if 'contenido_dinamico' not in st.session_state:
-    st.session_state.contenido_dinamico = CONTENIDO_CATEGORIAS_BASE
+if 'view' not in st.session_state: st.session_state.view = 'chat'
+if 'respuesta_actual' not in st.session_state: st.session_state.respuesta_actual = None
+if 'categoria' not in st.session_state: st.session_state.categoria = "Salud Sexual"
+if 'historial' not in st.session_state: st.session_state.historial = []
+if 'contenido_dinamico' not in st.session_state: st.session_state.contenido_dinamico = CONTENIDO_CATEGORIAS_BASE
 
-
-# --- BARRA LATERAL (SIDEBAR) ---
 st.sidebar.title("Secciones")
 categoria_seleccionada = st.sidebar.selectbox(
     "Elige un área de consulta:",
@@ -258,7 +308,6 @@ else:
             st.markdown(f"**Tú:** {pregunta}")
             st.markdown(f"**Asistente:** {respuesta}")
 
-# --- Lógica de actualización de estado ---
 if categoria_seleccionada != st.session_state.categoria:
     st.session_state.categoria = categoria_seleccionada
     st.session_state.respuesta_actual = None
@@ -266,38 +315,29 @@ if categoria_seleccionada != st.session_state.categoria:
     st.session_state.historial = [] 
     st.rerun()
 
-# --- Encabezado ---
 info_categoria = st.session_state.contenido_dinamico[st.session_state.categoria]
 img_base64 = get_image_as_base_64("logo.png")
 
-# CAMBIO: Se usa st.markdown con HTML y CSS para un control total de la alineación
 if img_base64:
     st.markdown(
         f"""
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            <img src="data:image/png;base64,{img_base64}" width="250">
-            <div style="margin-left: 20px;">
-                <h2 style="margin-bottom: 0;">IntegraSalud SDE</h2>
-                <p style="margin-top: 0; color: grey;">{info_categoria['titulo']}</p>
+        <div class="custom-header">
+            <img src="data:image/png;base64,{img_base64}">
+            <div>
+                <h2 class="title-text">IntegraSalud SDE</h2>
+                <p class="caption-text">{info_categoria["titulo"]}</p>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+        """, unsafe_allow_html=True)
 else:
-    # Fallback si el logo no se encuentra, para que la app no se rompa
-    st.header("IntegraSalud SDE")
-    st.caption(info_categoria["titulo"])
+    st.title(f"💬 {info_categoria['titulo']}")
     st.warning("Logo no encontrado.")
 
-
-st.markdown("---")
 st.markdown("Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.")
 
-# --- Lógica de Renderizado ---
 if st.session_state.view == 'turno':
     mostrar_interfaz_de_turnos()
-else: # Vista 'chat'
+else:
     placeholder = info_categoria["placeholder"]
     
     with st.form(key="chat_form", clear_on_submit=True):
