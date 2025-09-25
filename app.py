@@ -229,21 +229,20 @@ CONTENIDO_CATEGORIAS_BASE = {
 }
 
 # --- LÓGICA DE TURNOS ANÓNIMOS ---
-def generar_codigo_aleatorio():
-    palabras = ["LUNA", "SOL", "RIOJA", "SALTA", "NORTE", "CEIBO", "FLOR", "PAZ"]
-    numero = random.randint(100, 999)
-    return f"{random.choice(palabras)}-{random.choice(palabras)}-{numero}"
 
 def generar_codigo_aleatorio():
     palabras = ["LUNA", "SOL", "RIOJA", "SALTA", "NORTE", "CEIBO", "FLOR", "PAZ"]
     numero = random.randint(100, 999)
     return f"{random.choice(palabras)}-{random.choice(palabras)}-{numero}"
 
-def mostrar_interfaz_de_turnos():
+def mostrar_interfaz_de_turnos(categoria_actual):
     st.info("#### 🗓️ Generador de Turno Anónimo")
-    centro_elegido = st.selectbox("1. Elige un centro de salud:", list(CENTROS_DE_SALUD.keys()))
+    
+    centros_de_salud_categoria = st.session_state.contenido_dinamico[categoria_actual]["centros_de_salud"]
+    
+    centro_elegido = st.selectbox("1. Elige un centro de salud:", list(centros_de_salud_categoria.keys()))
     if centro_elegido:
-        especialidades_disponibles = CENTROS_DE_SALUD[centro_elegido]
+        especialidades_disponibles = centros_de_salud_categoria[centro_elegido]
         especialidad_elegida = st.selectbox("2. Elige una especialidad:", especialidades_disponibles)
         if st.button("Generar mi código anónimo"):
             codigo = generar_codigo_aleatorio()
@@ -293,7 +292,7 @@ def obtener_respuesta_hibrida(query, categoria_seleccionada):
             return f"Hubo un problema al contactar a la IA. Error técnico: {e}", "error"
     
     return "No encontré una respuesta y el modo online no está activo o falló.", "error"
-
+    
 
 # --- INTERFAZ PRINCIPAL ---
 def get_image_as_base_64(file):
@@ -392,5 +391,6 @@ else:
 # --- PIE DE PÁGINA ---
 st.markdown("---")
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
+
 
 
