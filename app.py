@@ -14,6 +14,12 @@ custom_css = """
     /* Oculta el encabezado por defecto para usar el nuestro */
     header {visibility: hidden;}
 
+    /* --- LÓGICA DE LOGOS ADAPTATIVOS --- */
+    /* Por defecto (tema oscuro), se muestra el logo oscuro y se oculta el claro */
+    .logo-dark { display: block; }
+    .logo-light { display: none; }
+
+    /* --- TEMA OSCURO (POR DEFECTO) --- */
     /* Mejora de Contraste General */
     .stApp {
         color: #e1e1e1;
@@ -36,11 +42,11 @@ custom_css = """
         margin-bottom: 2rem;
     }
     .custom-header img {
-        width: 450px; /* Tamaño de logo ajustado */
+        width: 400px; /* Tamaño de logo ajustado */
         margin-right: 1.5rem;
     }
     .custom-header .title-text {
-        font-size: 2.8rem;
+        font-size: 2.7rem;
         font-weight: 600;
         margin: 0;
         line-height: 1.2;
@@ -48,7 +54,7 @@ custom_css = """
     }
     .custom-header .caption-text {
         margin: 0;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         color: #a0a0a0;
     }
     
@@ -103,6 +109,29 @@ custom_css = """
         font-size: 1rem;
         font-weight: 600;
         color: #e1e1e1;
+    }
+
+    /* --- TEMA CLARO (SE ACTIVA AUTOMÁTICAMENTE) --- */
+    @media (prefers-color-scheme: light) {
+        /* Se invierte la visibilidad de los logos */
+        .logo-dark { display: none; }
+        .logo-light { display: block; }
+
+        .stApp {
+            background-color: #eef3f8; /* Fondo claro */
+            color: #262730; /* Texto oscuro */
+        }
+        .st-emotion-cache-1cypcdb { /* Contenedor de la barra lateral */
+             background-color: #FFFFFF;
+        }
+        .custom-header .title-text { color: #0d2a4d; }
+        .custom-header .caption-text { color: #6c757d; }
+        .user-bubble { background-color: #007bff; color: white; }
+        .assistant-bubble { background-color: #f0f2f6; color: #262730; }
+        div[data-testid="stForm"] { border-color: #d0d0d0; }
+        .footer-text, .st-emotion-cache-1cypcdb p, .st-emotion-cache-1cypcdb li { color: #6c757d; }
+        div[data-testid="stExpander"] { background-color: #f0f2f6; border-color: #d0d0d0; }
+        div[data-testid="stExpander"] summary { color: #262730; }
     }
 
     /* Media Query para celulares */
@@ -375,13 +404,16 @@ if categoria_seleccionada != st.session_state.categoria:
     st.rerun()
 
 info_categoria = st.session_state.contenido_dinamico[st.session_state.categoria]
-img_base64 = get_image_as_base_64("logo.png")
+img_dark_base64 = get_image_as_base_64("logo_dark.png")
+img_light_base64 = get_image_as_base_64("logo_light.png")
 
-if img_base64:
+if img_dark_base64 and img_light_base64:
     st.markdown(
         f"""
         <div class="custom-header">
-            <img src="data:image/png;base64,{img_base64}">
+            <!-- Dos logos: uno para cada tema -->
+            <img class="logo-dark" src="data:image/png;base64,{img_dark_base64}">
+            <img class="logo-light" src="data:image/png;base64,{img_light_base64}">
             <div>
                 <h2 class="title-text">IntegraSalud SDE</h2>
                 <p class="caption-text">{info_categoria["titulo"]}</p>
@@ -390,7 +422,7 @@ if img_base64:
         """, unsafe_allow_html=True)
 else:
     st.title(f"💬 {info_categoria['titulo']}")
-    st.warning("Logo no encontrado.")
+    st.warning("Asegúrate de tener 'logo_dark.png' y 'logo_light.png' en la carpeta.")
 
 # --- Lógica de Renderizado ---
 if st.session_state.view == 'turno':
