@@ -6,7 +6,7 @@ import base64
 from pathlib import Path
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="IntegraSalud SDE", page_icon="logo.png", layout="wide")
+st.set_page_config(page_title="IntegraSalud SDE", page_icon="favicon.png", layout="wide")
 
 # --- ESTILOS CSS ---
 custom_css = """
