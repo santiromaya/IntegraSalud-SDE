@@ -176,10 +176,10 @@ model = None
 online_mode_ready = False 
 
 # CORRECCIÓN: La forma correcta de verificar si la clave existe
-if api_key == st.secrets.get("GOOGLE_API_KEY"):
+if api_key:
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        model = genai.GenerativeModel("gemini-2.5-flash")
         online_mode_ready = True
     except Exception as e:
         st.error(f"Error al configurar la API de Google. El modo online no funcionará.")
