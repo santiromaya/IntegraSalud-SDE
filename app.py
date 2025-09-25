@@ -36,11 +36,11 @@ custom_css = """
         margin-bottom: 2rem;
     }
     .custom-header img {
-        width: 75px; /* Tamaño de logo ajustado */
+        width: 450px; /* Tamaño de logo ajustado */
         margin-right: 1.5rem;
     }
     .custom-header .title-text {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 600;
         margin: 0;
         line-height: 1.2;
@@ -117,16 +117,16 @@ custom_css = """
             text-align: center;
         }
         .custom-header img {
-            width: 70px;
+            width: 300px;
             margin-right: 0;
             margin-bottom: 1rem;
         }
         .custom-header .title-text {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             margin-bottom: 0.25rem;
         }
         .custom-header .caption-text {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
         }
         div[data-testid="stForm"] {
             padding: 1rem;
