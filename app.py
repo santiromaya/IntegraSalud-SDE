@@ -25,15 +25,17 @@ custom_css = """
         font-size: 2rem !important; /* Aumentado aún más */
     }
 
-    /* Estructura del encabezado personalizado */
+   /* Estructura del encabezado personalizado */
     .custom-header {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        margin-bottom: 2rem; /* Aumentado */
+        justify-content: center;
+        margin-bottom: 2rem;
     }
     .custom-header img {
-        width: 400px; 
-        margin-right: 20px; /* Aumentado */
+        width: 450px; 
+        margin-right: 1.5rem;
     }
     .custom-header .title-text {
         font-size: 3rem;
@@ -108,12 +110,12 @@ else:
     st.warning("API Key no encontrada en secrets.toml. El modo online está desactivado.")
 
 
-# --- CONTENIDO DE LAS CATEGORÍAS (Base estática) ---
+# --- CONTENIDO DE LAS CATEGORÍAS (Base estática y centros de salud) ---
 CONTENIDO_CATEGORIAS_BASE = {
     "Salud Sexual": {
         "emoji": "💬",
         "titulo": "Asistente de Salud Sexual 🩺💊",
-        "placeholder": "Prueba con 'ITS' o 'turno'...",
+        "placeholder": "Prueba con 'ITS' o 'anticonceptivo'...",
         "preguntas_frecuentes": {
             "its": """
             Las Infecciones de Transmisión Sexual (ITS) se transmiten de una persona a otra durante las relaciones sexuales. Algunas comunes son VPH, sífilis, y VIH. Muchas no presentan síntomas, por lo que el uso de **preservativo** y los controles médicos son clave.
@@ -138,7 +140,13 @@ CONTENIDO_CATEGORIAS_BASE = {
             **Tu Identidad:** Eres 'IntegraSalud', un asistente virtual educativo sobre **Salud Sexual y Reproductiva**.
             **Tu Misión:** Proporcionar información clara, precisa, científica, inclusiva y libre de prejuicios.
             **REGLAS:** No actúes como un médico. Siempre recomienda consultar a un profesional. Si te preguntan por un turno, indica que escriban la palabra 'turno'.
-        """
+        """,
+        "centros_de_salud": {
+            "Upa N° 2 B° Cáceres (Capital)": ["Ginecología", "Clínica Médica", "Testeo Rápido ITS"],
+            "CePSI 'Eva Perón' (Capital)": ["Salud Adolescente", "Ginecología"],
+            "Hospital Regional 'Dr. Ramón Carrillo'": ["Ginecología", "Urología", "Infectología"],
+            "CISB La Banda": ["Clínica Médica", "Ginecología", "Testeo Rápido ITS"]
+        }
     },
     "Salud Mental": {
         "emoji": "🧠",
@@ -169,9 +177,14 @@ CONTENIDO_CATEGORIAS_BASE = {
         },
         "system_prompt": """
             **Tu Identidad:** Eres 'IntegraSalud', un asistente virtual de apoyo para el **Bienestar Emocional**.
-            **Tu Misión:** Ofrecer un espacio seguro para que los usuarios se expresen. Proporciona información general y estrategias de afrontamiento.
-            **REGLAS:** No eres un terapeuta. Jamás diagnostiques. Anima siempre al usuario a buscar ayuda profesional (psicólogo/a, psiquiatra) como el paso más importante. Tu tono debe ser calmado y empático.
-        """
+            **Tu Misión:** Ofrecer un espacio seguro para que los usuarios se expresen.
+            **REGLAS:** No eres un terapeuta. Jamás diagnostiques. Anima siempre al usuario a buscar ayuda profesional (psicólogo/a, psiquiatra).
+        """,
+        "centros_de_salud": {
+            "Hospital Psiquiátrico 'Diego Alcorta'": ["Psicología", "Psiquiatría", "Terapia de Grupo"],
+            "Centro de Salud Mental 'Dr. C. J. Coronel'": ["Consulta Psicológica", "Apoyo Familiar"],
+            "Consultorios Externos H. Regional": ["Psicología de Adultos", "Psicología Infantil"]
+        }
     },
     "Nutrición": {
         "emoji": "🥗",
@@ -204,19 +217,22 @@ CONTENIDO_CATEGORIAS_BASE = {
         },
         "system_prompt": """
             **Tu Identidad:** Eres 'IntegraSalud', un asistente virtual educativo sobre **Nutrición y Alimentación Saludable**.
-            **Tu Misión:** Proporcionar información basada en evidencia científica sobre alimentos y hábitos saludables.
-            **REGLAS:** No eres un nutricionista. No puedes crear planes de dieta personalizados. Siempre recomienda consultar a un nutricionista o médico para obtener asesoramiento personalizado, especialmente si existen condiciones médicas.
-        """
+            **Tu Misión:** Proporcionar información basada en evidencia científica.
+            **REGLAS:** No eres un nutricionista. No puedes crear planes de dieta personalizados. Siempre recomienda consultar a un profesional.
+        """,
+        "centros_de_salud": {
+            "Hospital Regional 'Dr. Ramón Carrillo'": ["Nutricionista", "Clínica Médica", "Endocrinología"],
+            "CISB La Banda": ["Consulta Nutricional", "Clínica Médica"],
+            "Upa N° 5 B° Autonomía": ["Nutricionista", "Control de Peso"]
+        }
     }
 }
 
 # --- LÓGICA DE TURNOS ANÓNIMOS ---
-CENTROS_DE_SALUD = {
-    "Upa N° 2 B° Cáceres (Capital)": ["Ginecología", "Clínica Médica", "Testeo Rápido ITS"],
-    "CePSI 'Eva Perón' (Capital)": ["Salud Adolescente", "Ginecología"],
-    "Hospital Regional 'Dr. Ramón Carrillo'": ["Ginecología", "Urología", "Infectología"],
-    "CISB La Banda": ["Clínica Médica", "Ginecología", "Testeo Rápido ITS"]
-}
+def generar_codigo_aleatorio():
+    palabras = ["LUNA", "SOL", "RIOJA", "SALTA", "NORTE", "CEIBO", "FLOR", "PAZ"]
+    numero = random.randint(100, 999)
+    return f"{random.choice(palabras)}-{random.choice(palabras)}-{numero}"
 
 def generar_codigo_aleatorio():
     palabras = ["LUNA", "SOL", "RIOJA", "SALTA", "NORTE", "CEIBO", "FLOR", "PAZ"]
@@ -333,7 +349,7 @@ else:
     st.title(f"💬 {info_categoria['titulo']}")
     st.warning("Logo no encontrado.")
 
-st.markdown("Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.")
+st.markdown("<p style='text-align: center;'>Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.</p>", unsafe_allow_html=True)
 
 if st.session_state.view == 'turno':
     mostrar_interfaz_de_turnos()
@@ -376,4 +392,5 @@ else:
 # --- PIE DE PÁGINA ---
 st.markdown("---")
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
+
 
