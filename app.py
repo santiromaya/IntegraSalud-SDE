@@ -36,11 +36,11 @@ custom_css = """
         margin-bottom: 2rem;
     }
     .custom-header img {
-        width: 450px; /* Tamaño de logo ajustado */
+        width: 75px; /* Tamaño de logo ajustado */
         margin-right: 1.5rem;
     }
     .custom-header .title-text {
-        font-size: 2.8rem;
+        font-size: 2.5rem;
         font-weight: 600;
         margin: 0;
         line-height: 1.2;
@@ -426,4 +426,3 @@ else:
 # --- PIE DE PÁGINA ---
 st.markdown("---")
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
-
