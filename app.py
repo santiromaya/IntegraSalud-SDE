@@ -147,7 +147,7 @@ model = None
 online_mode_ready = False 
 
 # CORRECCIÓN: La forma correcta de verificar si la clave existe
-if api_key:
+if api_key == st.secrets.get("GOOGLE_API_KEY"):
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash-latest')
@@ -396,6 +396,7 @@ else:
 if st.session_state.view == 'turno':
     mostrar_interfaz_de_turnos(st.session_state.categoria)
 else:
+    st.markdown("<p style='text-align: center;'>Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.</p>", unsafe_allow_html=True)
     # Mostrar el historial de chat como burbujas
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for i, (pregunta, respuesta) in enumerate(st.session_state.historial):
