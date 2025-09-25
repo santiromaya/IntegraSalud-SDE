@@ -6,10 +6,9 @@ import base64
 from pathlib import Path
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-# CAMBIO: Se ajusta el layout a "wide" para ocupar más espacio horizontal.
-st.set_page_config(page_title="IntegraSalud SDE", page_icon="favicon.png", layout="wide")
+st.set_page_config(page_title="IntegraSalud SDE", page_icon="logo.png", layout="wide")
 
-# --- ESTILOS CSS (CON LAYOUT AMPLIO) ---
+# --- ESTILOS CSS ---
 custom_css = """
 <style>
     /* Oculta el encabezado por defecto para usar el nuestro */
@@ -21,64 +20,117 @@ custom_css = """
     }
 
     /* Contenedor Principal */
-    .main .block-container p {
-        font-size: 2rem !important; /* Aumentado aún más */
+    .main .block-container {
+        max-width: 900px; /* Un ancho ideal para chat */
+        margin: auto;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
 
     /* Estructura del encabezado personalizado */
     .custom-header {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        margin-bottom: 2rem; /* Aumentado */
+        justify-content: center;
+        margin-bottom: 2rem;
     }
     .custom-header img {
-        width: 400px; 
-        margin-right: 20px; /* Aumentado */
+        width: 450px; /* Tamaño de logo ajustado */
+        margin-right: 1.5rem;
     }
     .custom-header .title-text {
-        font-size: 3rem;
+        font-size: 2.8rem;
         font-weight: 600;
         margin: 0;
         line-height: 1.2;
         color: #ffffff;
     }
     .custom-header .caption-text {
-        /* CAMBIO: Tamaño de fuente aumentado en un 25% */
         margin: 0;
         font-size: 1.3rem;
         color: #a0a0a0;
     }
     
+    /* Burbujas de Chat */
+    .chat-bubble {
+        padding: 0.8rem 1.2rem;
+        border-radius: 20px;
+        margin-bottom: 1rem;
+        max-width: 80%;
+        display: inline-block;
+        word-wrap: break-word;
+    }
+    .user-bubble {
+        background-color: #33415c; /* Un azul oscuro para el usuario */
+        margin-left: auto;
+        border-bottom-right-radius: 5px;
+        text-align: right;
+    }
+    .assistant-bubble {
+        background-color: #262730; /* Un gris oscuro para el asistente */
+        border-bottom-left-radius: 5px;
+    }
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+    }
+
     /* Formulario de consulta */
     div[data-testid="stForm"] {
-        font-size: 1.5rem !important;
         border: 1px solid #444;
-        border-radius: 10px;
-        padding: 1.5rem 1.5rem 0.6rem 1.5rem; /* Aumentado */
-        margin-top: 1.25rem; /* Aumentado */
+        border-radius: 20px;
+        padding: 1.25rem;
+        margin: 1.25rem auto 0 auto; /* Centra el formulario */
+        max-width: 80%;
+        text-align: center;
     }
     
+    /* Footer */
+    .footer-text {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #a0a0a0;
+    }
+
+    /* Estilos para el expander del historial */
+    div[data-testid="stExpander"] {
+        border: 1px solid #444;
+        border-radius: 10px;
+        background-color: #1c1c1e;
+    }
+    div[data-testid="stExpander"] summary {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #e1e1e1;
+    }
+
     /* Media Query para celulares */
     @media (max-width: 640px) {
         .main .block-container {
-            padding: 1.25rem; /* Aumentado */
+            padding: 1rem;
             max-width: 100%;
         }
+        .custom-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
         .custom-header img {
-            /* CAMBIO: Tamaño del logo aumentado en un 25% */
-            width: 56px;
-            margin-right: 12px; /* Aumentado */
+            width: 70px;
+            margin-right: 0;
+            margin-bottom: 1rem;
         }
         .custom-header .title-text {
-            /* CAMBIO: Tamaño de fuente aumentado en un 25% */
-            font-size: 1.875rem;
+            font-size: 1.8rem;
+            margin-bottom: 0.25rem;
         }
         .custom-header .caption-text {
-            /* CAMBIO: Tamaño de fuente aumentado en un 25% */
-            font-size: 1.125rem;
+            font-size: 1.5rem;
         }
         div[data-testid="stForm"] {
-            padding: 1rem; /* Aumentado */
+            padding: 1rem;
+            max-width: 100%;
         }
     }
 </style>
@@ -87,7 +139,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 
 
 # --- API KEY ---
-# Lee la clave desde el archivo secrets.toml
 api_key = st.secrets.get("GOOGLE_API_KEY")
 
 
@@ -95,8 +146,8 @@ api_key = st.secrets.get("GOOGLE_API_KEY")
 model = None
 online_mode_ready = False 
 
-# La forma correcta de verificar si la clave existe
-if api_key == st.secrets.get("GOOGLE_API_KEY"):
+# CORRECCIÓN: La forma correcta de verificar si la clave existe
+if api_key:
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash-latest')
@@ -108,12 +159,12 @@ else:
     st.warning("API Key no encontrada en secrets.toml. El modo online está desactivado.")
 
 
-# --- CONTENIDO DE LAS CATEGORÍAS (Base estática) ---
+# --- CONTENIDO DE LAS CATEGORÍAS (Base estática y centros de salud) ---
 CONTENIDO_CATEGORIAS_BASE = {
     "Salud Sexual": {
         "emoji": "💬",
         "titulo": "Asistente de Salud Sexual 🩺💊",
-        "placeholder": "Prueba con 'ITS' o 'turno'...",
+        "placeholder": "Prueba con 'ITS' o 'anticonceptivo'...",
         "preguntas_frecuentes": {
             "its": """
             Las Infecciones de Transmisión Sexual (ITS) se transmiten de una persona a otra durante las relaciones sexuales. Algunas comunes son VPH, sífilis, y VIH. Muchas no presentan síntomas, por lo que el uso de **preservativo** y los controles médicos son clave.
@@ -138,7 +189,13 @@ CONTENIDO_CATEGORIAS_BASE = {
             **Tu Identidad:** Eres 'IntegraSalud', un asistente virtual educativo sobre **Salud Sexual y Reproductiva**.
             **Tu Misión:** Proporcionar información clara, precisa, científica, inclusiva y libre de prejuicios.
             **REGLAS:** No actúes como un médico. Siempre recomienda consultar a un profesional. Si te preguntan por un turno, indica que escriban la palabra 'turno'.
-        """
+        """,
+        "centros_de_salud": {
+            "Upa N° 2 B° Cáceres (Capital)": ["Ginecología", "Clínica Médica", "Testeo Rápido ITS"],
+            "CePSI 'Eva Perón' (Capital)": ["Salud Adolescente", "Ginecología"],
+            "Hospital Regional 'Dr. Ramón Carrillo'": ["Ginecología", "Urología", "Infectología"],
+            "CISB La Banda": ["Clínica Médica", "Ginecología", "Testeo Rápido ITS"]
+        }
     },
     "Salud Mental": {
         "emoji": "🧠",
@@ -169,9 +226,14 @@ CONTENIDO_CATEGORIAS_BASE = {
         },
         "system_prompt": """
             **Tu Identidad:** Eres 'IntegraSalud', un asistente virtual de apoyo para el **Bienestar Emocional**.
-            **Tu Misión:** Ofrecer un espacio seguro para que los usuarios se expresen. Proporciona información general y estrategias de afrontamiento.
-            **REGLAS:** No eres un terapeuta. Jamás diagnostiques. Anima siempre al usuario a buscar ayuda profesional (psicólogo/a, psiquiatra) como el paso más importante. Tu tono debe ser calmado y empático.
-        """
+            **Tu Misión:** Ofrecer un espacio seguro para que los usuarios se expresen.
+            **REGLAS:** No eres un terapeuta. Jamás diagnostiques. Anima siempre al usuario a buscar ayuda profesional (psicólogo/a, psiquiatra).
+        """,
+        "centros_de_salud": {
+            "Hospital Psiquiátrico 'Diego Alcorta'": ["Psicología", "Psiquiatría", "Terapia de Grupo"],
+            "Centro de Salud Mental 'Dr. C. J. Coronel'": ["Consulta Psicológica", "Apoyo Familiar"],
+            "Consultorios Externos H. Regional": ["Psicología de Adultos", "Psicología Infantil"]
+        }
     },
     "Nutrición": {
         "emoji": "🥗",
@@ -204,30 +266,31 @@ CONTENIDO_CATEGORIAS_BASE = {
         },
         "system_prompt": """
             **Tu Identidad:** Eres 'IntegraSalud', un asistente virtual educativo sobre **Nutrición y Alimentación Saludable**.
-            **Tu Misión:** Proporcionar información basada en evidencia científica sobre alimentos y hábitos saludables.
-            **REGLAS:** No eres un nutricionista. No puedes crear planes de dieta personalizados. Siempre recomienda consultar a un nutricionista o médico para obtener asesoramiento personalizado, especialmente si existen condiciones médicas.
-        """
+            **Tu Misión:** Proporcionar información basada en evidencia científica.
+            **REGLAS:** No eres un nutricionista. No puedes crear planes de dieta personalizados. Siempre recomienda consultar a un profesional.
+        """,
+        "centros_de_salud": {
+            "Hospital Regional 'Dr. Ramón Carrillo'": ["Nutricionista", "Clínica Médica", "Endocrinología"],
+            "CISB La Banda": ["Consulta Nutricional", "Clínica Médica"],
+            "Upa N° 5 B° Autonomía": ["Nutricionista", "Control de Peso"]
+        }
     }
 }
 
 # --- LÓGICA DE TURNOS ANÓNIMOS ---
-CENTROS_DE_SALUD = {
-    "Upa N° 2 B° Cáceres (Capital)": ["Ginecología", "Clínica Médica", "Testeo Rápido ITS"],
-    "CePSI 'Eva Perón' (Capital)": ["Salud Adolescente", "Ginecología"],
-    "Hospital Regional 'Dr. Ramón Carrillo'": ["Ginecología", "Urología", "Infectología"],
-    "CISB La Banda": ["Clínica Médica", "Ginecología", "Testeo Rápido ITS"]
-}
-
 def generar_codigo_aleatorio():
     palabras = ["LUNA", "SOL", "RIOJA", "SALTA", "NORTE", "CEIBO", "FLOR", "PAZ"]
     numero = random.randint(100, 999)
     return f"{random.choice(palabras)}-{random.choice(palabras)}-{numero}"
 
-def mostrar_interfaz_de_turnos():
+def mostrar_interfaz_de_turnos(categoria_actual):
     st.info("#### 🗓️ Generador de Turno Anónimo")
-    centro_elegido = st.selectbox("1. Elige un centro de salud:", list(CENTROS_DE_SALUD.keys()))
+    
+    centros_de_salud_categoria = st.session_state.contenido_dinamico[categoria_actual]["centros_de_salud"]
+    
+    centro_elegido = st.selectbox("1. Elige un centro de salud:", list(centros_de_salud_categoria.keys()))
     if centro_elegido:
-        especialidades_disponibles = CENTROS_DE_SALUD[centro_elegido]
+        especialidades_disponibles = centros_de_salud_categoria[centro_elegido]
         especialidad_elegida = st.selectbox("2. Elige una especialidad:", especialidades_disponibles)
         if st.button("Generar mi código anónimo"):
             codigo = generar_codigo_aleatorio()
@@ -257,7 +320,7 @@ def mostrar_interfaz_de_turnos():
 def obtener_respuesta_hibrida(query, categoria_seleccionada):
     query_minusculas = query.lower()
     
-    if categoria_seleccionada == "Salud Sexual" and "turno" in query_minusculas:
+    if "turno" in query_minusculas:
         return None, "turno"
         
     preguntas_offline = st.session_state.contenido_dinamico[categoria_seleccionada]["preguntas_frecuentes"]
@@ -286,12 +349,13 @@ def get_image_as_base_64(file):
         return base64.b64encode(data).decode()
     except FileNotFoundError: return None
 
+# --- NAVEGACIÓN Y ESTADO ---
 if 'view' not in st.session_state: st.session_state.view = 'chat'
-if 'respuesta_actual' not in st.session_state: st.session_state.respuesta_actual = None
 if 'categoria' not in st.session_state: st.session_state.categoria = "Salud Sexual"
 if 'historial' not in st.session_state: st.session_state.historial = []
 if 'contenido_dinamico' not in st.session_state: st.session_state.contenido_dinamico = CONTENIDO_CATEGORIAS_BASE
 
+# --- BARRA LATERAL (SIDEBAR) ---
 st.sidebar.title("Secciones")
 categoria_seleccionada = st.sidebar.selectbox(
     "Elige un área de consulta:",
@@ -299,18 +363,15 @@ categoria_seleccionada = st.sidebar.selectbox(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("Historial de Consultas")
-if not st.session_state.historial:
-    st.sidebar.write("Aún no hay consultas.")
-else:
-    for i, (pregunta, respuesta) in enumerate(st.session_state.historial):
-        with st.sidebar.expander(f"Consulta #{i+1}: {pregunta[:30]}..."):
-            st.markdown(f"**Tú:** {pregunta}")
-            st.markdown(f"**Asistente:** {respuesta}")
+with st.sidebar.expander("Historial de Consultas", expanded=True):
+    if not st.session_state.historial:
+        st.write("Aún no hay consultas.")
+    else:
+        for i, (pregunta, _) in enumerate(st.session_state.historial[-5:]):
+            st.info(f"{pregunta[:35]}...")
 
 if categoria_seleccionada != st.session_state.categoria:
     st.session_state.categoria = categoria_seleccionada
-    st.session_state.respuesta_actual = None
     st.session_state.view = 'chat'
     st.session_state.historial = [] 
     st.rerun()
@@ -333,11 +394,17 @@ else:
     st.title(f"💬 {info_categoria['titulo']}")
     st.warning("Logo no encontrado.")
 
-st.markdown("Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.")
-
+# --- Lógica de Renderizado ---
 if st.session_state.view == 'turno':
-    mostrar_interfaz_de_turnos()
+    mostrar_interfaz_de_turnos(st.session_state.categoria)
 else:
+    # Mostrar el historial de chat como burbujas
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    for i, (pregunta, respuesta) in enumerate(st.session_state.historial):
+        st.markdown(f'<div class="chat-bubble user-bubble">{pregunta}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-bubble assistant-bubble">{respuesta}</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
     placeholder = info_categoria["placeholder"]
     
     with st.form(key="chat_form", clear_on_submit=True):
@@ -348,30 +415,13 @@ else:
         )
         submitted = st.form_submit_button("Consultar")
 
-    if submitted:
-        if user_query:
-            respuesta, metodo = obtener_respuesta_hibrida(user_query, st.session_state.categoria)
-            if metodo == "turno":
-                st.session_state.view = 'turno'
-            else:
-                st.session_state.respuesta_actual = (respuesta, metodo)
-                st.session_state.historial.append((user_query, respuesta))
+    if submitted and user_query:
+        respuesta, metodo = obtener_respuesta_hibrida(user_query, st.session_state.categoria)
+        if metodo == "turno":
+            st.session_state.view = 'turno'
         else:
-            st.warning("Por favor, escribe tu consulta.")
-            st.session_state.respuesta_actual = None
-        st.rerun() 
-            
-    if st.session_state.respuesta_actual:
-        respuesta, metodo = st.session_state.respuesta_actual
-        if metodo == "offline":
-            st.success("✔️ Respuesta Rápida (Offline)")
-            st.markdown(respuesta)
-        elif metodo == "online":
-            st.info("🌐 Respuesta Detallada (Online)")
-            st.markdown(respuesta)
-        else: 
-            st.error("Hubo un problema")
-            st.markdown(respuesta)
+            st.session_state.historial.append((user_query, respuesta))
+        st.rerun()
 
 # --- PIE DE PÁGINA ---
 st.markdown("---")
