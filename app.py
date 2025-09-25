@@ -349,13 +349,11 @@ def get_image_as_base_64(file):
         return base64.b64encode(data).decode()
     except FileNotFoundError: return None
 
-# --- NAVEGACIÓN Y ESTADO ---
 if 'view' not in st.session_state: st.session_state.view = 'chat'
 if 'categoria' not in st.session_state: st.session_state.categoria = "Salud Sexual"
 if 'historial' not in st.session_state: st.session_state.historial = []
 if 'contenido_dinamico' not in st.session_state: st.session_state.contenido_dinamico = CONTENIDO_CATEGORIAS_BASE
 
-# --- BARRA LATERAL (SIDEBAR) ---
 st.sidebar.title("Secciones")
 categoria_seleccionada = st.sidebar.selectbox(
     "Elige un área de consulta:",
