@@ -25,14 +25,6 @@ custom_css = """
         color: #e1e1e1;
     }
 
-    /* Posición del botón de menú */
-    .stButton>button[kind="secondary"] {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
     /* Contenedor Principal */
     .main .block-container {
         max-width: 900px; /* Un ancho ideal para chat */
