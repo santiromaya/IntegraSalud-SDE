@@ -60,6 +60,12 @@ custom_css = """
         font-size: 1.2rem;
         color: #a0a0a0;
     }
+
+    /* Estilo para el mensaje de bienvenida */
+    .welcome-message {
+        margin-bottom: -10rem;
+        text-align: center;  /* Para centrarlo */
+    }
     
     /* Burbujas de Chat */
     .chat-bubble {
@@ -190,9 +196,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 api_key = st.secrets.get("GOOGLE_API_KEY")
 
 # --- LÓGICA ONLINE ---
-st.markdown("---")
-st.subheader("Estado de la Conexión (Mensajes de Depuración)")
-
 model = None
 online_mode_ready = False 
 
@@ -450,7 +453,7 @@ else:
 if st.session_state.view == 'turno':
     mostrar_interfaz_de_turnos(st.session_state.categoria)
 else:
-    st.markdown("<p style='text-align: center;'>Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.</p>", unsafe_allow_html=True)
+    st.markdown("<p class='welcome-message'>Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.</p>", unsafe_allow_html=True)
     # Mostrar el historial de chat como burbujas
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for i, (pregunta, respuesta) in enumerate(st.session_state.historial):
