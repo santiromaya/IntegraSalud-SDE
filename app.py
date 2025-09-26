@@ -25,6 +25,14 @@ custom_css = """
         color: #e1e1e1;
     }
 
+    /* Posición del botón de menú */
+    .stButton>button[kind="secondary"] {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
     /* Contenedor Principal */
     .main .block-container {
         max-width: 900px; /* Un ancho ideal para chat */
@@ -175,66 +183,11 @@ custom_css = """
             padding: 1rem;
             max-width: 100%;
         }
-
-        /* Ocultar sidebar en mobile */
-        .sidebar {
-            display: none;
-        }
-
-        /* Botón hamburguesa */
-        .hamburger {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            width: 30px;
-            height: 25px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            z-index: 1000;
-        }
-
-        .hamburger span {
-            display: block;
-            height: 4px;
-            background: #fff;
-            border-radius: 2px;
-        }
-
-        /* Menú desplegable */
-        .mobile-menu {
-            display: none;
-            position: absolute;
-            top: 50px;
-            left: 0;
-            width: 100%;
-            background: #0d1117;
-            padding: 10px;
-            text-align: center;
-            z-index: 999;
-        }
-
-        .mobile-menu a {
-            display: block;
-            padding: 10px;
-            color: #fff;
-            text-decoration: none;
-            border-bottom: 1px solid #222;
-        }
-
-        .mobile-menu a:hover {
-            background: #111827;
-        }
-
-        /* Mostrar menú cuando está activo */
-        .mobile-menu.active {
-            display: block;
-        }
-    }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
+
+
 
 # --- API KEY ---
 api_key = st.secrets.get("GOOGLE_API_KEY")
@@ -246,7 +199,7 @@ online_mode_ready = False
 if api_key == st.secrets.get("GOOGLE_API_KEY"):
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash-lite")
         online_mode_ready = True
     except Exception as e:
         st.error(f"Error al configurar la API de Google. El modo online no funcionará.")
@@ -444,6 +397,7 @@ def get_image_as_base_64(file):
         return base64.b64encode(data).decode()
     except FileNotFoundError: return None
 
+# --- NAVEGACIÓN Y ESTADO ---
 if 'view' not in st.session_state: st.session_state.view = 'chat'
 if 'categoria' not in st.session_state: st.session_state.categoria = "Salud Sexual"
 if 'historial' not in st.session_state: st.session_state.historial = []
