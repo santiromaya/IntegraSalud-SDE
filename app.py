@@ -41,10 +41,12 @@ custom_css = """
         justify-content: center;
         margin-bottom: 2rem;
     }
+
     .custom-header img {
         width: 400px; /* Tamaño de logo ajustado */
         margin-right: 1.5rem;
     }
+
     .custom-header .title-text {
         font-size: 2.7rem;
         font-weight: 600;
@@ -52,6 +54,7 @@ custom_css = """
         line-height: 1.2;
         color: #ffffff;
     }
+
     .custom-header .caption-text {
         margin: 0;
         font-size: 1.2rem;
@@ -67,16 +70,19 @@ custom_css = """
         display: inline-block;
         word-wrap: break-word;
     }
+
     .user-bubble {
         background-color: #33415c; /* Un azul oscuro para el usuario */
         margin-left: auto;
         border-bottom-right-radius: 5px;
         text-align: right;
     }
+
     .assistant-bubble {
         background-color: #262730; /* Un gris oscuro para el asistente */
         border-bottom-left-radius: 5px;
     }
+
     .chat-container {
         display: flex;
         flex-direction: column;
@@ -105,6 +111,7 @@ custom_css = """
         border-radius: 10px;
         background-color: #1c1c1e;
     }
+
     div[data-testid="stExpander"] summary {
         font-size: 1rem;
         font-weight: 600;
@@ -121,9 +128,11 @@ custom_css = """
             background-color: #eef3f8; /* Fondo claro */
             color: #262730; /* Texto oscuro */
         }
+
         .st-emotion-cache-1cypcdb { /* Contenedor de la barra lateral */
              background-color: #FFFFFF;
         }
+
         .custom-header .title-text { color: #0d2a4d; }
         .custom-header .caption-text { color: #6c757d; }
         .user-bubble { background-color: #007bff; color: white; }
@@ -140,42 +149,100 @@ custom_css = """
             padding: 1rem;
             max-width: 100%;
         }
+
         .custom-header {
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
+
         .custom-header img {
             width: 300px;
             margin-right: 0;
             margin-bottom: 1rem;
         }
+
         .custom-header .title-text {
             font-size: 2.2rem;
             margin-bottom: 0.25rem;
         }
+
         .custom-header .caption-text {
             font-size: 1.2rem;
         }
+        
         div[data-testid="stForm"] {
             padding: 1rem;
             max-width: 100%;
+        }
+
+        /* Ocultar sidebar en mobile */
+        .sidebar {
+            display: none;
+        }
+
+        /* Botón hamburguesa */
+        .hamburger {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .hamburger span {
+            display: block;
+            height: 4px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        /* Menú desplegable */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            background: #0d1117;
+            padding: 10px;
+            text-align: center;
+            z-index: 999;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 10px;
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid #222;
+        }
+
+        .mobile-menu a:hover {
+            background: #111827;
+        }
+
+        /* Mostrar menú cuando está activo */
+        .mobile-menu.active {
+            display: block;
         }
     }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-
 # --- API KEY ---
 api_key = st.secrets.get("GOOGLE_API_KEY")
-
 
 # --- LÓGICA ONLINE ---
 model = None
 online_mode_ready = False 
 
-# CORRECCIÓN: La forma correcta de verificar si la clave existe
 if api_key:
     try:
         genai.configure(api_key=api_key)
@@ -186,7 +253,6 @@ if api_key:
         st.exception(e) 
 else:
     st.warning("API Key no encontrada en secrets.toml. El modo online está desactivado.")
-
 
 # --- CONTENIDO DE LAS CATEGORÍAS (Base estática y centros de salud) ---
 CONTENIDO_CATEGORIAS_BASE = {
