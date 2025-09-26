@@ -204,7 +204,7 @@ if api_key == api_key:
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash")
         online_mode_ready = True
         st.success("✅ **Paso 2: Configuración con la API de Google exitosa.** El modo online está listo.")
 
@@ -488,5 +488,6 @@ else:
 st.markdown("---")
 
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
+
 
 
