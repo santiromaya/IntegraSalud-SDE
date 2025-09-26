@@ -197,22 +197,17 @@ model = None
 online_mode_ready = False 
 
 if api_key == api_key:
-    st.success("✅ **Paso 1: API Key encontrada en los secretos de Streamlit.**")
-
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-2.0-flash")
         online_mode_ready = True
-        st.success("✅ **Paso 2: Configuración con la API de Google exitosa.** El modo online está listo.")
 
     except Exception as e:
-        st.error("❌ **Paso 2: La configuración con la API de Google falló.**")
         st.write("La clave fue encontrada, pero es inválida o hay otro problema. El error técnico es:")
         st.exception(e) 
 else:
-    st.error("❌ **Paso 1: No se encontró la API Key en los secretos de Streamlit.**")
+    st.error("❌ No se encontró la API Key en los secretos de Streamlit. El modo online no funcionará.")
     st.warning("Asegúrate de que el secreto se llame exactamente 'GOOGLE_API_KEY' y que hayas guardado los cambios y reiniciado la app.")
-st.markdown("---")
 
 # --- CONTENIDO DE LAS CATEGORÍAS (Base estática y centros de salud) ---
 CONTENIDO_CATEGORIAS_BASE = {
