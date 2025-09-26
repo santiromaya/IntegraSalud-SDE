@@ -243,7 +243,7 @@ api_key = st.secrets.get("GOOGLE_API_KEY")
 model = None
 online_mode_ready = False 
 
-if api_key:
+if api_key == st.secrets.get("GOOGLE_API_KEY"):
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-2.5-flash")
