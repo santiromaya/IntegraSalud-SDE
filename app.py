@@ -193,19 +193,29 @@ st.markdown(custom_css, unsafe_allow_html=True)
 api_key = st.secrets.get("GOOGLE_API_KEY")
 
 # --- LÓGICA ONLINE ---
+st.markdown("---")
+st.subheader("Estado de la Conexión (Mensajes de Depuración)")
+
 model = None
 online_mode_ready = False 
 
-if api_key == st.secrets.get("GOOGLE_API_KEY"):
+if api_key:
+    st.success("✅ **Paso 1: API Key encontrada en los secretos de Streamlit.**")
+
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash-latest")
         online_mode_ready = True
+        st.success("✅ **Paso 2: Configuración con la API de Google exitosa.** El modo online está listo.")
+
     except Exception as e:
-        st.error(f"Error al configurar la API de Google. El modo online no funcionará.")
+        st.error("❌ **Paso 2: La configuración con la API de Google falló.**")
+        st.write("La clave fue encontrada, pero es inválida o hay otro problema. El error técnico es:")
         st.exception(e) 
 else:
-    st.warning("API Key no encontrada en secrets.toml. El modo online está desactivado.")
+    st.error("❌ **Paso 1: No se encontró la API Key en los secretos de Streamlit.**")
+    st.warning("Asegúrate de que el secreto se llame exactamente 'GOOGLE_API_KEY' y que hayas guardado los cambios y reiniciado la app.")
+st.markdown("---")
 
 # --- CONTENIDO DE LAS CATEGORÍAS (Base estática y centros de salud) ---
 CONTENIDO_CATEGORIAS_BASE = {
