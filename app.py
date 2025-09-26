@@ -106,7 +106,7 @@ custom_css = """
     
     /* Footer */
     .footer-text {
-        text-align: center;
+        text-align: left;
         font-size: 0.9rem;
         color: #a0a0a0;
     }
@@ -453,6 +453,12 @@ else:
 if st.session_state.view == 'turno':
     mostrar_interfaz_de_turnos(st.session_state.categoria)
 else:
+    st.markdown("")
+    st.markdown("")
+    st.markdown("")
+    st.markdown("")
+    st.markdown("")
+    st.markdown("")
     st.markdown("<p class='welcome-message'>Bienvenido/a a IntegraSalud, un espacio seguro para tus dudas.</p>", unsafe_allow_html=True)
     # Mostrar el historial de chat como burbujas
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
@@ -480,8 +486,10 @@ else:
         st.rerun()
 
 # --- PIE DE PÁGINA ---
+st.markdown("")
+st.markdown("")
 st.markdown("---")
-
+st.markdown("<p class='footer-text'>Copyright © 2025</p>", unsafe_allow_html=True)
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
 
 
