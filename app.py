@@ -118,6 +118,11 @@ custom_css = """
         color: #e1e1e1;
     }
 
+    /* --- CORRECCIÓN BOTÓN VOLVER --- */
+    div[data-testid="stButton"] > button {
+        width: 100%;
+    }
+
     /* --- TEMA CLARO (SE ACTIVA AUTOMÁTICAMENTE) --- */
     @media (prefers-color-scheme: light) {
         /* Se invierte la visibilidad de los logos */
