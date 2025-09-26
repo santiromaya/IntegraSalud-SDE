@@ -476,4 +476,5 @@ else:
 
 # --- PIE DE PÁGINA ---
 st.markdown("---")
+
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
