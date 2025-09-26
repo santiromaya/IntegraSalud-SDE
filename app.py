@@ -199,7 +199,7 @@ online_mode_ready = False
 if api_key == api_key:
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-flash-lite")
+        model = genai.GenerativeModel("gemini-1.5-flash-lite")
         online_mode_ready = True
     except Exception as e:
         st.error(f"Error al configurar la API de Google. El modo online no funcionará.")
