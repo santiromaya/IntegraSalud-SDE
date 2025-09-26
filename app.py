@@ -199,7 +199,7 @@ st.subheader("Estado de la Conexión (Mensajes de Depuración)")
 model = None
 online_mode_ready = False 
 
-if api_key:
+if api_key == api_key:
     st.success("✅ **Paso 1: API Key encontrada en los secretos de Streamlit.**")
 
     try:
@@ -488,3 +488,4 @@ else:
 st.markdown("---")
 
 st.markdown("<p class='footer-text'>Desarrollado con ❤️ por Santino, Virginia, Candela y Milagros</p>", unsafe_allow_html=True)
+
